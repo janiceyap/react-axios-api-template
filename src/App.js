@@ -16,6 +16,10 @@ function App() {
 
   // Fetch contact data from API
   const apiGetContacts = async () => {
+    const { status, data } = await API.get('/contacts');
+    if ( status === 200) {
+      setContactList(data);
+    }
     
   }
 
@@ -25,6 +29,13 @@ function App() {
     setContactList(newList);
     setIsEditMode(false);   // For Edit function
     // Add async/wait for API.delete
+    try {
+      const response = await API.delete(`/contacts/${id}`);
+      console.log('API.delete response', response);
+    } catch (err) {
+      console.log("API.delete error:", err.message);
+    }
+
   }
   // Edit contact form setup (1)
   const editItem = item => {
@@ -45,13 +56,24 @@ function App() {
       setContactList(newList);
       setIsEditMode(false);
       // Add async/await for API.put
-
+      try {
+        const response = await API.put(`/contacts/${formItem.id}`, formItem);
+        console.log('API.put response', response);
+      } catch (err) {
+        console.log("API.put error:", err.message);
+      }
 
     } else {
       const newItem = {...formItem, id: uniqueId('id')};
       const newList = [newItem, ...contactList];
       setContactList(newList);
       // Add async/await for API.post
+      try {
+        const response = await API.post('/contacts', newItem);
+        console.log('API.post response', response);
+      } catch (err) {
+        console.log("API.post error:", err.message);
+      }
            
     }
     setFormItem(blankForm);
@@ -72,6 +94,7 @@ function App() {
   // Load contact list when component is mounted
   useEffect( () => {
     console.log('App.useEffect')
+    apiGetContacts();
   }, [])
   
   return (
